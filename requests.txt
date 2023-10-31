@@ -1,0 +1,39 @@
+1) SELECT C.FirstName, C.LastName
+FROM Customers AS C
+JOIN (
+    SELECT CustomerID, SUM(TotalAmount) AS TotalOrdersAmount
+    FROM Orders
+    GROUP BY CustomerID
+    ) AS OA
+ON C.CustomerID = OA.CustomerID
+ORDER BY OA.TotalOrdersAmount DESC
+LIMIT 1;
+
+2) SELECT O.OrderID, O.TotalAmount
+FROM Orders AS O
+WHERE O.CustomerID = (
+    SELECT C.CustomerID
+    FROM Customers AS C
+    JOIN (
+        SELECT CustomerID, SUM(TotalAmount) AS TotalOrdersAmount
+        FROM Orders
+        GROUP BY CustomerID
+    ) AS OA
+    ON C.CustomerID = OA.CustomerID
+    ORDER BY OA.TotalOrdersAmount DESC
+    LIMIT 1
+);
+
+3) SELECT C.FirstName, C.LastName
+FROM Customers AS C
+JOIN (
+    SELECT CustomerID, AVG(TotalAmount) AS AvgOrdersAmount
+    FROM Orders
+    GROUP BY CustomerID
+    ) AS AvgOA
+ON C.CustomerID = AvgOA.CustomerID
+WHERE AvgOA.AvgOrdersAmount < (
+    SELECT AVG(TotalAmount)
+    FROM Orders
+    )
+ORDER BY AvgOA.AvgOrdersAmount DESC;
